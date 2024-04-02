@@ -1,18 +1,123 @@
 {
-  "name": "@utilcode/simple-template-advanced",
+  "name": "@scdb/refactored-sniffle",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "engines": {
+    "node": ">=10.0.0"
   },
-  "author": "",
+  "exports": {
+    "require": "./dist/jssm.es5.cjs",
+    "import": "./dist/jssm.es6.mjs",
+    "default": "./dist/jssm.es5.cjs",
+    "browser": "dist/jssm.es5.iife.cjs"
+  },
+  "autoupdate": {
+    "source": "git",
+    "target": "git://github.com/StoneCypher/jssm.git",
+    "fileMap": [
+      {
+        "basePath": "/dist",
+        "files": [
+          "jssm.es5.cjs"
+        ]
+      }
+    ]
+  },
+  "type": "module",
+  "description": "A Javascript finite state machine (FSM) with a terse DSL and a simple API.  Most FSMs are one-liners.  Fast, easy, powerful, well tested, typed with TypeScript, and visualizations. MIT License.",
+  "main": "dist/jssm.es5.cjs",
+  "module": "dist/jssm.es6.js",
+  "browser": "dist/jssm.es5.iife.cjs",
+  "types": "./jssm.d.ts",
+  "keywords": [
+    "finite",
+    "state",
+    "state machine",
+    "state-machine",
+    "machine",
+    "finite-state-machine",
+    "finite state machine",
+    "fsm",
+    "fsm-library",
+    "js",
+    "javascript",
+    "javascript-library",
+    "mit-license",
+    "tested",
+    "typed",
+    "typed-js",
+    "mealy",
+    "moore",
+    "mealy machine",
+    "moore machine",
+    "mealy-machine",
+    "moore-machine",
+    "graphviz",
+    "viz.js",
+    "fsl",
+    "finite-state-language",
+    "flowchart",
+    "visualization",
+    "TypeScript",
+    "StoneCypher"
+  ],
+  "author": "thestrangedev",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/utilcode/simple-template.git"
+  "devDependencies": {
+    "@knodes/typedoc-plugin-pages": "^0.22.5",
+    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-replace": "^4.0.0",
+    "@types/chalk": "^2.2.0",
+    "@types/jest": "^27.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.30.4",
+    "@typescript-eslint/parser": "^5.30.4",
+    "benny": "^3.7.1",
+    "cloc": "^2.10.0",
+    "eslint": "^7.32.0",
+    "eslint-plugin-fp": "^2.3.0",
+    "eslint-plugin-new-with-error": "^2.0.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-react": "^7.26.1",
+    "eslint-plugin-unicorn": "^37.0.1",
+    "fast-check": "^2.12.0",
+    "glob": "^7.1.6",
+    "jest": "^27.3.1",
+    "jest-json-reporter2": "^1.1.0",
+    "pegjs": "^0.10.0",
+    "picocolors": "^1.0.0",
+    "rollup": "^2.72.1",
+    "semver": "^7.5.4",
+    "terser": "^5.14.2",
+    "text_audit": "^0.9.3",
+    "ts-jest": "^27.0.7",
+    "twitter-api-client": "^1.6.0",
+    "typedoc": "^0.22.18",
+    "typedoc-plugin-missing-exports": "^0.23.0",
+    "typescript": "^4.7.4",
+    "xml2js": "^0.6.2"
   },
   "dependencies": {
-    "axios": "^1.6.8"
-  }
+    "@scdb/crispy-tribble": "^1.0.0",
+    "@scdb/curly-robot": "^1.0.0",
+    "@scdb/didactic-spoon": "^1.0.0",
+    "@scdb/friendly-octo-couscous": "^1.0.4",
+    "@scdb/glowing-potato": "^1.0.0",
+    "@scdb/improved-tribble": "^1.0.0",
+    "@scdb/silver-octo-meme": "^1.0.1",
+    "@scdb/simple-http": "^1.0.7",
+    "@scdb/urban-carnival": "^1.0.0",
+    "@scdb/urban-octo-garbanzo": "^1.0.0",
+    "better_git_changelog": "^1.6.1",
+    "circular_buffer_js": "^1.10.0",
+    "reduce-to-639-1": "^1.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SCDBRepo/refactored-sniffle.git"
+  },
+  "homepage": "https://github.com/SCDBRepo/refactored-sniffle/#readme",
+  "bugs": {
+    "url": "https://github.com/SCDBRepo/refactored-sniffle/issues"
+  },
+  "packageManager": "yarn@4.1.1"
 }

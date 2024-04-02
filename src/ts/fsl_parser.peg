@@ -1,0 +1,1168 @@
+
+// If you're in PegJS Online and see "Missing initializer in const declaration,"
+// go down to the rule Exp and take the typescript type off of the const there
+//
+// Then do the same thing on SubExp
+//
+// Just search for "Reminder"
+//
+// Can't take it out permanently because it's necessary for the typescript chain
+
+
+
+
+
+Document
+  = WS? e:TermList WS? { return e; }
+
+
+
+
+
+Theme
+  = "none"
+  / "default"
+  / "modern"
+  / "ocean"
+  / "bold"
+
+ThemeOrThemeList
+  = '[' WS? ths:(Theme WS)* th:Theme? ']' { const themes = ths.map(t => t[0]); themes.push(th); return themes; }
+  / th:Theme                              { return [th]; }
+
+
+
+
+
+GvizShape
+  = "box3d"
+  / "polygon"
+  / "ellipse"
+  / "oval"
+  / "circle"
+  / "point"
+  / "egg"
+  / "triangle"
+  / "plaintext"
+  / "plain"
+  / "diamond"
+  / "trapezium"
+  / "parallelogram"
+  / "house"
+  / "pentagon"
+  / "hexagon"
+  / "septagon"
+  / "octagon"
+  / "doublecircle"
+  / "doubleoctagon"
+  / "tripleoctagon"
+  / "invtriangle"
+  / "invtrapezium"
+  / "invhouse"
+  / "Mdiamond"
+  / "Msquare"
+  / "Mcircle"
+  / "rectangle"
+  / "rect"
+  / "square"
+  / "star"
+  / "none"
+  / "underline"
+  / "cylinder"
+  / "note"
+  / "tab"
+  / "folder"
+  / "box"
+  / "component"
+  / "promoter"
+  / "cds"
+  / "terminator"
+  / "utr"
+  / "primersite"
+  / "restrictionsite"
+  / "fivepoverhang"
+  / "threepoverhang"
+  / "noverhang"
+  / "assembly"
+  / "signature"
+  / "insulator"
+  / "ribosite"
+  / "rnastab"
+  / "proteasesite"
+  / "proteinstab"
+  / "rpromoter"
+  / "rarrow"
+  / "larrow"
+  / "lpromoter"
+  / "record"
+
+
+ForwardLightArrow "forward light arrow ->"
+  = "->"
+  / "→" { return "->"; }
+
+TwoWayLightArrow "two way light arrow <->"
+  = "<->"
+  / "↔" { return "<->"; }
+
+BackLightArrow "back light arrow <-"
+  = "<-"
+  / "←" { return "<-"; }
+
+
+ForwardFatArrow "forward fat arrow =>"
+  = "=>"
+  / "⇒" { return "=>"; }
+
+TwoWayFatArrow "two way fat arrow <=>"
+  = "<=>"
+  / "⇔" { return "<=>"; }
+
+BackFatArrow "back fat arrow <="
+  = "<="
+  / "⇐" { return "<="; }
+
+
+ForwardTildeArrow "forward tilde arrow ~>"
+  = "~>"
+  / "↛" { return "~>"; }
+
+TwoWayTildeArrow "two way tilde arrow <~>"
+  = "<~>"
+  / "↮" { return "<~>"; }
+
+BackTildeArrow "back tilde arrow <~"
+  = "<~"
+  / "↚" { return "<~"; }
+
+
+LightFatArrow "light fat arrow <-=>"
+  = "<-=>"
+  / "←⇒" { return "<-=>"; }
+
+LightTildeArrow "light tilde arrow <-~>"
+  = "<-~>"
+  / "←↛" { return "<-~>"; }
+
+FatLightArrow "fat light arrow <=->"
+  = "<=->"
+  / "⇐→" { return "<=->"; }
+
+FatTildeArrow "fat tilde arrow <=~>"
+  = "<=~>"
+  / "⇐↛" { return "<=~>"; }
+
+TildeLightArrow "tilde light arrow <~->"
+  = "<~->"
+  / "↚→" { return "<~->"; }
+
+TildeFatArrow "tilde fat arrow <~=>"
+  = "<~=>"
+  / "↚⇒" { return "<~=>"; }
+
+
+LightArrow "light arrow"
+  = ForwardLightArrow / TwoWayLightArrow / BackLightArrow
+
+FatArrow "fat arrow"
+  = ForwardFatArrow / TwoWayFatArrow / BackFatArrow
+
+TildeArrow "tilde arrow"
+  = ForwardTildeArrow / TwoWayTildeArrow / BackTildeArrow
+
+MixedArrow "mixed arrow"
+  = LightFatArrow / LightTildeArrow / FatLightArrow / FatTildeArrow / TildeLightArrow / TildeFatArrow
+
+
+Arrow "arrow"
+  = MixedArrow / LightArrow / FatArrow / TildeArrow
+
+
+
+Boolean
+  = "true"  { return true;  }
+  / "false" { return false; }
+
+Corners
+  = "regular"
+  / "rounded"
+  / "lined"
+
+LineStyle
+  = "solid"
+  / "dotted"
+  / "dashed"
+
+Char
+  = Unescaped
+  / Escape Sequence:(
+        '"'
+      / "\\"
+      / "/"
+      / "b" { return "\b"; }
+      / "f" { return "\f"; }
+      / "n" { return "\n"; }
+      / "r" { return "\r"; }
+      / "t" { return "\t"; }
+      / "v" { return "\v"; }
+      / "u" digits:$(HexDigit HexDigit HexDigit HexDigit) {
+          return String.fromCharCode(parseInt(digits, 16));
+        }
+    )
+    { return Sequence; }
+
+Null      = 'null'      { return null; }
+Undefined = 'undefined' { return undefined; }
+
+Escape    = "\\"
+QuoteMark = '"'
+Unescaped = [\x00-\x21\x23-\x5B\x5D-\uFFFF]  // explicitly omits "
+
+ActionLabelChar
+  = ActionLabelUnescaped
+  / Escape Sequence:(
+        "'"
+      / "\\"
+      / "/"
+      / "b" { return "\b"; }
+      / "f" { return "\f"; }
+      / "n" { return "\n"; }
+      / "r" { return "\r"; }
+      / "t" { return "\t"; }
+      / "v" { return "\v"; }
+      / "u" digits:$(HexDigit HexDigit HexDigit HexDigit) {
+          return String.fromCharCode(parseInt(digits, 16));
+        }
+    )
+    { return Sequence; }
+
+ActionLabelQuoteMark = "'"
+ActionLabelUnescaped = [\x20-\x26\x28-\x5B\x5D-\uFFFF]  // explicitly omits ' which is hex 27
+
+ActionLabel "action label"
+  = ActionLabelQuoteMark chars:ActionLabelChar* ActionLabelQuoteMark { return chars.join(""); }
+
+LineTerminator
+  = [\n\r\u2028\u2029]
+
+Whitespace
+  = [ \t\n\r\v]+
+
+BlockCommentTail
+  = "*/"
+  / . BlockCommentTail
+
+BlockComment "block comment"
+  = "/*" BlockCommentTail
+
+EOF
+  = !.
+
+LineCommentTail
+  = LineTerminator
+  / EOF
+  / . LineCommentTail
+
+LineComment "line comment"
+  = "//" LineCommentTail
+
+WS "whitespace"
+  = BlockComment WS?
+  / LineComment  WS?
+  / [ \t\r\n\v]+ WS?
+
+String "string"
+  = QuoteMark chars:Char* QuoteMark { return chars.join(""); }
+
+AtomFirstLetter
+  = [0-9a-zA-Z\.\_\!\$\^\*\!\?\,\x80-\uFFFF]
+
+AtomLetter
+  = [0-9a-zA-Z\.\+\_\^\(\)\*\&\$\#\@\!\?\,\x80-\uFFFF]
+
+Atom "atom"
+  = firstletter:AtomFirstLetter text:AtomLetter* {
+      return firstletter + ((text || []).join(''));
+    }
+
+Label "label"
+  = atom:Atom
+  / string:String
+
+IntegerLiteral
+  = "0"
+  / NonZeroDigit DecimalDigit*
+
+DecimalDigit
+  = [0-9]
+
+NonZeroDigit
+  = [1-9]
+
+HexDigit
+  = [0-9a-f]i
+
+BinaryDigit
+  = [0-1]
+
+OctalDigit
+  = [0-1]
+
+NonNegNumber "nonneg number"
+  = IntegerLiteral "." DecimalDigit* WS? { return parseFloat(text()); }
+  / IntegerLiteral                   WS? { return parseFloat(text()); }
+
+
+
+
+
+JsNumericLiteral "number"
+  = literal:JsHexIntegerLiteral      { return literal; }
+  / literal:JsBinaryIntegerLiteral   { return literal; }
+  / literal:NonJsOctalIntegerLiteral { return literal; }
+  / literal:JsDecimalLiteral         { return literal; }
+  / 'NaN'                            { return NaN; }
+  / 'NegativeInfinity'               { return Number.NEGATIVE_INFINITY; }
+  / 'NegativeInf'                    { return Number.NEGATIVE_INFINITY; }
+  / 'NegInfinity'                    { return Number.NEGATIVE_INFINITY; }
+  / 'NegInf'                         { return Number.NEGATIVE_INFINITY; }
+  / 'NInfinity'                      { return Number.NEGATIVE_INFINITY; }
+  / 'NInf'                           { return Number.NEGATIVE_INFINITY; }
+  / '-∞'                             { return Number.NEGATIVE_INFINITY; }
+  / 'PInfinity'                      { return Number.POSITIVE_INFINITY; }
+  / 'Infinity'                       { return Number.POSITIVE_INFINITY; }
+  / 'PInf'                           { return Number.POSITIVE_INFINITY; }
+  / 'Inf'                            { return Number.POSITIVE_INFINITY; }
+  / '∞'                              { return Number.POSITIVE_INFINITY; }
+  / 'Epsilon'                        { return Number.EPSILON; }
+  / '𝜀'                              { return Number.EPSILON; }            // math page epsilon
+  / 'ε'                              { return Number.EPSILON; }            // greek language epsilon
+  / 'Pi'                             { return Math.PI; }
+  / '𝜋'                              { return Math.PI; }
+  / 'π'                              { return Math.PI; }
+  / 'EulerNumber'                    { return Math.E; }
+  / 'E'                              { return Math.E; }
+  / 'e'                              { return Math.E; }
+  / 'Ɛ'                              { return Math.E; }
+  / 'ℇ'                              { return Math.E; }
+  / 'Root2'                          { return Math.SQRT2; }
+  / 'RootHalf'                       { return Math.SQRT1_2; }
+  / 'Ln2'                            { return Math.LN2; }
+  / 'NatLog2'                        { return Math.LN2; }
+  / 'Ln10'                           { return Math.LN10; }
+  / 'NatLog10'                       { return Math.LN10; }
+  / 'Log2E'                          { return Math.LOG2E; }
+  / 'Log10E'                         { return Math.LOG10E; }
+  / 'MaxSafeInt'                     { return Number.MAX_SAFE_INTEGER; }
+  / 'MinSafeInt'                     { return Number.MIN_SAFE_INTEGER; }
+  / 'MaxPosNum'                      { return Number.MAX_VALUE; }
+  / 'MinPosNum'                      { return Number.MIN_VALUE; }
+  / 'Phi'                            { return 1.61803398874989484820; }    // doubles trace 16 decimal digits, so 20 is extra
+  / '𝜑'                              { return 1.61803398874989484820; }
+  / '𝜙'                              { return 1.61803398874989484820; }
+  / 'ϕ'                              { return 1.61803398874989484820; }
+  / 'φ'                              { return 1.61803398874989484820; }
+  / 'EulerConstant'                  { return 0.57721566490153286060; }
+  / 'γ'                              { return 0.57721566490153286060; }
+  / '𝛾'                              { return 0.57721566490153286060; }
+  / 'γ'                              { return 0.57721566490153286060; }
+
+JsDecimalLiteral
+  = JsDecimalIntegerLiteral "." DecimalDigit* JsNExponentPart? { return parseFloat(text()); }
+  /                         "." DecimalDigit+ JsNExponentPart? { return parseFloat(text()); }
+  / JsDecimalIntegerLiteral                   JsNExponentPart? { return parseFloat(text()); }
+
+JsDecimalIntegerLiteral
+  = "0"
+  / NonZeroDigit DecimalDigit*
+
+JsNExponentPart
+  = JsNExponentIndicator JsNSignedInteger
+
+JsNExponentIndicator
+  = "e"i
+
+JsNSignedInteger
+  = [+-]? DecimalDigit+
+
+JsHexIntegerLiteral
+  = "0x"i digits:$HexDigit+ {
+      return parseInt(digits, 16);
+     }
+
+JsBinaryIntegerLiteral
+  = "0b"i digits:$BinaryDigit+ {
+      return parseInt(digits, 2);
+     }
+
+NonJsOctalIntegerLiteral
+  = "0o"i digits:$OctalDigit+ {
+      return parseInt(digits, 8);
+     }
+
+
+
+
+
+SemVer
+  = major:IntegerLiteral "." minor:IntegerLiteral "." patch:IntegerLiteral
+  { return {
+    major: parseInt(major,10),
+    minor: parseInt(minor,10),
+    patch: parseInt(patch,10),
+    full: text()
+  }; }
+
+SemVerOper
+  = "^"
+  / "~"
+  / ">="
+  / "<="
+  / "<"
+  / ">"
+
+SemVerRule
+  = SemVerOper? SemVer
+
+SemVerRange
+  = SemVerRule SemVerRule?
+
+
+
+
+
+UrlProtocol
+  = 'http://'
+  / 'https://'
+
+URL
+  = protocol:UrlProtocol [a-zA-Z0-9\!\*\'\(\)\:\;\@\&\=\+\$\,\/\?\#\[\]\_\.\~\-]+ { return text(); }
+
+
+
+SvgColorLabel
+  = 'aliceblue'            { return '#f0f8ffff'; }              / 'AliceBlue'            { return '#f0f8ffff'; }
+  / 'antiquewhite'         { return '#faebd7ff'; }              / 'AntiqueWhite'         { return '#faebd7ff'; }
+
+/* out of order because otherwise aqua would pre-run aquamarine */
+  / 'aquamarine'           { return '#7fffd4ff'; }              / 'Aquamarine'           { return '#7fffd4ff'; }
+  / 'aqua'                 { return '#00ffffff'; }              / 'Aqua'                 { return '#00ffffff'; }
+  / 'azure'                { return '#f0ffffff'; }              / 'Azure'                { return '#f0ffffff'; }
+  / 'beige'                { return '#f5f5dcff'; }              / 'Beige'                { return '#f5f5dcff'; }
+  / 'bisque'               { return '#ffe4c4ff'; }              / 'Bisque'               { return '#ffe4c4ff'; }
+  / 'black'                { return '#000000ff'; }              / 'Black'                { return '#000000ff'; }
+  / 'blanchedalmond'       { return '#ffebcdff'; }              / 'BlanchedAlmond'       { return '#ffebcdff'; }
+
+/* out of order because otherwise blue would pre-run blueviolet */
+  / 'blueviolet'           { return '#8a2be2ff'; }              / 'BlueViolet'           { return '#8a2be2ff'; }
+  / 'blue'                 { return '#0000ffff'; }              / 'Blue'                 { return '#0000ffff'; }
+  / 'brown'                { return '#a52a2aff'; }              / 'Brown'                { return '#a52a2aff'; }
+  / 'burlywood'            { return '#deb887ff'; }              / 'BurlyWood'            { return '#deb887ff'; }
+  / 'cadetblue'            { return '#5f9ea0ff'; }              / 'CadetBlue'            { return '#5f9ea0ff'; }
+  / 'chartreuse'           { return '#7fff00ff'; }              / 'Chartreuse'           { return '#7fff00ff'; }
+  / 'chocolate'            { return '#d2691eff'; }              / 'Chocolate'            { return '#d2691eff'; }
+  / 'coral'                { return '#ff7f50ff'; }              / 'Coral'                { return '#ff7f50ff'; }
+  / 'cornflowerblue'       { return '#6495edff'; }              / 'CornflowerBlue'       { return '#6495edff'; }
+  / 'cornsilk'             { return '#fff8dcff'; }              / 'Cornsilk'             { return '#fff8dcff'; }
+  / 'crimson'              { return '#dc143cff'; }              / 'Crimson'              { return '#dc143cff'; }
+  / 'cyan'                 { return '#00ffffff'; }              / 'Cyan'                 { return '#00ffffff'; }
+  / 'darkblue'             { return '#00008bff'; }              / 'DarkBlue'             { return '#00008bff'; }
+  / 'darkcyan'             { return '#008b8bff'; }              / 'DarkCyan'             { return '#008b8bff'; }
+  / 'darkgoldenrod'        { return '#b8860bff'; }              / 'DarkGoldenRod'        { return '#b8860bff'; }
+  / 'darkgray'             { return '#a9a9a9ff'; }              / 'DarkGray'             { return '#a9a9a9ff'; }
+  / 'darkgrey'             { return '#a9a9a9ff'; }              / 'DarkGrey'             { return '#a9a9a9ff'; }
+  / 'darkgreen'            { return '#006400ff'; }              / 'DarkGreen'            { return '#006400ff'; }
+  / 'darkkhaki'            { return '#bdb76bff'; }              / 'DarkKhaki'            { return '#bdb76bff'; }
+  / 'darkmagenta'          { return '#8b008bff'; }              / 'DarkMagenta'          { return '#8b008bff'; }
+  / 'darkolivegreen'       { return '#556b2fff'; }              / 'DarkOliveGreen'       { return '#556b2fff'; }
+  / 'darkorange'           { return '#ff8c00ff'; }              / 'Darkorange'           { return '#ff8c00ff'; }
+  / 'darkorchid'           { return '#9932ccff'; }              / 'DarkOrchid'           { return '#9932ccff'; }
+  / 'darkred'              { return '#8b0000ff'; }              / 'DarkRed'              { return '#8b0000ff'; }
+  / 'darksalmon'           { return '#e9967aff'; }              / 'DarkSalmon'           { return '#e9967aff'; }
+  / 'darkseagreen'         { return '#8fbc8fff'; }              / 'DarkSeaGreen'         { return '#8fbc8fff'; }
+  / 'darkslateblue'        { return '#483d8bff'; }              / 'DarkSlateBlue'        { return '#483d8bff'; }
+  / 'darkslategray'        { return '#2f4f4fff'; }              / 'DarkSlateGray'        { return '#2f4f4fff'; }
+  / 'darkslategrey'        { return '#2f4f4fff'; }              / 'DarkSlateGrey'        { return '#2f4f4fff'; }
+  / 'darkturquoise'        { return '#00ced1ff'; }              / 'DarkTurquoise'        { return '#00ced1ff'; }
+  / 'darkviolet'           { return '#9400d3ff'; }              / 'DarkViolet'           { return '#9400d3ff'; }
+  / 'deeppink'             { return '#ff1493ff'; }              / 'DeepPink'             { return '#ff1493ff'; }
+  / 'deepskyblue'          { return '#00bfffff'; }              / 'DeepSkyBlue'          { return '#00bfffff'; }
+  / 'dimgray'              { return '#696969ff'; }              / 'DimGray'              { return '#696969ff'; }
+  / 'dimgrey'              { return '#696969ff'; }              / 'DimGrey'              { return '#696969ff'; }
+  / 'dodgerblue'           { return '#1e90ffff'; }              / 'DodgerBlue'           { return '#1e90ffff'; }
+  / 'firebrick'            { return '#b22222ff'; }              / 'FireBrick'            { return '#b22222ff'; }
+  / 'floralwhite'          { return '#fffaf0ff'; }              / 'FloralWhite'          { return '#fffaf0ff'; }
+  / 'forestgreen'          { return '#228b22ff'; }              / 'ForestGreen'          { return '#228b22ff'; }
+  / 'fuchsia'              { return '#ff00ffff'; }              / 'Fuchsia'              { return '#ff00ffff'; }
+  / 'gainsboro'            { return '#dcdcdcff'; }              / 'Gainsboro'            { return '#dcdcdcff'; }
+  / 'ghostwhite'           { return '#f8f8ffff'; }              / 'GhostWhite'           { return '#f8f8ffff'; }
+
+/* out of order because otherwise gold would pre-run goldenrod */
+  / 'goldenrod'            { return '#daa520ff'; }              / 'GoldenRod'            { return '#daa520ff'; }
+  / 'gold'                 { return '#ffd700ff'; }              / 'Gold'                 { return '#ffd700ff'; }
+  / 'gray'                 { return '#808080ff'; }              / 'Gray'                 { return '#808080ff'; }
+  / 'grey'                 { return '#808080ff'; }              / 'Grey'                 { return '#808080ff'; }
+
+/* out of order because otherwise green would pre-run greenyellow */
+  / 'greenyellow'          { return '#adff2fff'; }              / 'GreenYellow'          { return '#adff2fff'; }
+  / 'green'                { return '#008000ff'; }              / 'Green'                { return '#008000ff'; }
+  / 'honeydew'             { return '#f0fff0ff'; }              / 'HoneyDew'             { return '#f0fff0ff'; }
+  / 'hotpink'              { return '#ff69b4ff'; }              / 'HotPink'              { return '#ff69b4ff'; }
+  / 'indianred'            { return '#cd5c5cff'; }              / 'IndianRed'            { return '#cd5c5cff'; }
+  / 'indigo'               { return '#4b0082ff'; }              / 'Indigo'               { return '#4b0082ff'; }
+  / 'ivory'                { return '#fffff0ff'; }              / 'Ivory'                { return '#fffff0ff'; }
+  / 'khaki'                { return '#f0e68cff'; }              / 'Khaki'                { return '#f0e68cff'; }
+
+/* out of order because otherwise lavender would pre-run lavenderblush */
+  / 'lavenderblush'        { return '#fff0f5ff'; }              / 'LavenderBlush'        { return '#fff0f5ff'; }
+  / 'lavender'             { return '#e6e6faff'; }              / 'Lavender'             { return '#e6e6faff'; }
+  / 'lawngreen'            { return '#7cfc00ff'; }              / 'LawnGreen'            { return '#7cfc00ff'; }
+  / 'lemonchiffon'         { return '#fffacdff'; }              / 'LemonChiffon'         { return '#fffacdff'; }
+  / 'lightblue'            { return '#add8e6ff'; }              / 'LightBlue'            { return '#add8e6ff'; }
+  / 'lightcoral'           { return '#f08080ff'; }              / 'LightCoral'           { return '#f08080ff'; }
+  / 'lightcyan'            { return '#e0ffffff'; }              / 'LightCyan'            { return '#e0ffffff'; }
+  / 'lightgoldenrodyellow' { return '#fafad2ff'; }              / 'LightGoldenRodYellow' { return '#fafad2ff'; }
+  / 'lightgray'            { return '#d3d3d3ff'; }              / 'LightGray'            { return '#d3d3d3ff'; }
+  / 'lightgrey'            { return '#d3d3d3ff'; }              / 'LightGrey'            { return '#d3d3d3ff'; }
+  / 'lightgreen'           { return '#90ee90ff'; }              / 'LightGreen'           { return '#90ee90ff'; }
+  / 'lightpink'            { return '#ffb6c1ff'; }              / 'LightPink'            { return '#ffb6c1ff'; }
+  / 'lightsalmon'          { return '#ffa07aff'; }              / 'LightSalmon'          { return '#ffa07aff'; }
+  / 'lightseagreen'        { return '#20b2aaff'; }              / 'LightSeaGreen'        { return '#20b2aaff'; }
+  / 'lightskyblue'         { return '#87cefaff'; }              / 'LightSkyBlue'         { return '#87cefaff'; }
+  / 'lightslategray'       { return '#778899ff'; }              / 'LightSlateGray'       { return '#778899ff'; }
+  / 'lightslategrey'       { return '#778899ff'; }              / 'LightSlateGrey'       { return '#778899ff'; }
+  / 'lightsteelblue'       { return '#b0c4deff'; }              / 'LightSteelBlue'       { return '#b0c4deff'; }
+  / 'lightyellow'          { return '#ffffe0ff'; }              / 'LightYellow'          { return '#ffffe0ff'; }
+
+/* out of order because otherwise lime would pre-run limegreen */
+  / 'limegreen'            { return '#32cd32ff'; }              / 'LimeGreen'            { return '#32cd32ff'; }
+  / 'lime'                 { return '#00ff00ff'; }              / 'Lime'                 { return '#00ff00ff'; }
+  / 'linen'                { return '#faf0e6ff'; }              / 'Linen'                { return '#faf0e6ff'; }
+  / 'magenta'              { return '#ff00ffff'; }              / 'Magenta'              { return '#ff00ffff'; }
+  / 'maroon'               { return '#800000ff'; }              / 'Maroon'               { return '#800000ff'; }
+  / 'mediumaquamarine'     { return '#66cdaaff'; }              / 'MediumAquaMarine'     { return '#66cdaaff'; }
+  / 'mediumblue'           { return '#0000cdff'; }              / 'MediumBlue'           { return '#0000cdff'; }
+  / 'mediumorchid'         { return '#ba55d3ff'; }              / 'MediumOrchid'         { return '#ba55d3ff'; }
+  / 'mediumpurple'         { return '#9370d8ff'; }              / 'MediumPurple'         { return '#9370d8ff'; }
+  / 'mediumseagreen'       { return '#3cb371ff'; }              / 'MediumSeaGreen'       { return '#3cb371ff'; }
+  / 'mediumslateblue'      { return '#7b68eeff'; }              / 'MediumSlateBlue'      { return '#7b68eeff'; }
+  / 'mediumspringgreen'    { return '#00fa9aff'; }              / 'MediumSpringGreen'    { return '#00fa9aff'; }
+  / 'mediumturquoise'      { return '#48d1ccff'; }              / 'MediumTurquoise'      { return '#48d1ccff'; }
+  / 'mediumvioletred'      { return '#c71585ff'; }              / 'MediumVioletRed'      { return '#c71585ff'; }
+  / 'midnightblue'         { return '#191970ff'; }              / 'MidnightBlue'         { return '#191970ff'; }
+  / 'mintcream'            { return '#f5fffaff'; }              / 'MintCream'            { return '#f5fffaff'; }
+  / 'mistyrose'            { return '#ffe4e1ff'; }              / 'MistyRose'            { return '#ffe4e1ff'; }
+  / 'moccasin'             { return '#ffe4b5ff'; }              / 'Moccasin'             { return '#ffe4b5ff'; }
+  / 'navajowhite'          { return '#ffdeadff'; }              / 'NavajoWhite'          { return '#ffdeadff'; }
+  / 'navy'                 { return '#000080ff'; }              / 'Navy'                 { return '#000080ff'; }
+  / 'oldlace'              { return '#fdf5e6ff'; }              / 'OldLace'              { return '#fdf5e6ff'; }
+
+/* out of order because otherwise olive would pre-run olivedrab */
+  / 'olivedrab'            { return '#6b8e23ff'; }              / 'OliveDrab'            { return '#6b8e23ff'; }
+  / 'olive'                { return '#808000ff'; }              / 'Olive'                { return '#808000ff'; }
+
+/* out of order because otherwise orange would pre-run orangered */
+  / 'orangered'            { return '#ff4500ff'; }              / 'OrangeRed'            { return '#ff4500ff'; }
+  / 'orange'               { return '#ffa500ff'; }              / 'Orange'               { return '#ffa500ff'; }
+  / 'orchid'               { return '#da70d6ff'; }              / 'Orchid'               { return '#da70d6ff'; }
+  / 'palegoldenrod'        { return '#eee8aaff'; }              / 'PaleGoldenRod'        { return '#eee8aaff'; }
+  / 'palegreen'            { return '#98fb98ff'; }              / 'PaleGreen'            { return '#98fb98ff'; }
+  / 'paleturquoise'        { return '#afeeeeff'; }              / 'PaleTurquoise'        { return '#afeeeeff'; }
+  / 'palevioletred'        { return '#d87093ff'; }              / 'PaleVioletRed'        { return '#d87093ff'; }
+  / 'papayawhip'           { return '#ffefd5ff'; }              / 'PapayaWhip'           { return '#ffefd5ff'; }
+  / 'peachpuff'            { return '#ffdab9ff'; }              / 'PeachPuff'            { return '#ffdab9ff'; }
+  / 'peru'                 { return '#cd853fff'; }              / 'Peru'                 { return '#cd853fff'; }
+  / 'pink'                 { return '#ffc0cbff'; }              / 'Pink'                 { return '#ffc0cbff'; }
+  / 'plum'                 { return '#dda0ddff'; }              / 'Plum'                 { return '#dda0ddff'; }
+  / 'powderblue'           { return '#b0e0e6ff'; }              / 'PowderBlue'           { return '#b0e0e6ff'; }
+  / 'purple'               { return '#800080ff'; }              / 'Purple'               { return '#800080ff'; }
+  / 'red'                  { return '#ff0000ff'; }              / 'Red'                  { return '#ff0000ff'; }
+  / 'rosybrown'            { return '#bc8f8fff'; }              / 'RosyBrown'            { return '#bc8f8fff'; }
+  / 'royalblue'            { return '#4169e1ff'; }              / 'RoyalBlue'            { return '#4169e1ff'; }
+  / 'saddlebrown'          { return '#8b4513ff'; }              / 'SaddleBrown'          { return '#8b4513ff'; }
+  / 'salmon'               { return '#fa8072ff'; }              / 'Salmon'               { return '#fa8072ff'; }
+  / 'sandybrown'           { return '#f4a460ff'; }              / 'SandyBrown'           { return '#f4a460ff'; }
+  / 'seagreen'             { return '#2e8b57ff'; }              / 'SeaGreen'             { return '#2e8b57ff'; }
+  / 'seashell'             { return '#fff5eeff'; }              / 'SeaShell'             { return '#fff5eeff'; }
+  / 'sienna'               { return '#a0522dff'; }              / 'Sienna'               { return '#a0522dff'; }
+  / 'silver'               { return '#c0c0c0ff'; }              / 'Silver'               { return '#c0c0c0ff'; }
+  / 'skyblue'              { return '#87ceebff'; }              / 'SkyBlue'              { return '#87ceebff'; }
+  / 'slateblue'            { return '#6a5acdff'; }              / 'SlateBlue'            { return '#6a5acdff'; }
+  / 'slategray'            { return '#708090ff'; }              / 'SlateGray'            { return '#708090ff'; }
+  / 'slategrey'            { return '#708090ff'; }              / 'SlateGrey'            { return '#708090ff'; }
+  / 'snow'                 { return '#fffafaff'; }              / 'Snow'                 { return '#fffafaff'; }
+  / 'springgreen'          { return '#00ff7fff'; }              / 'SpringGreen'          { return '#00ff7fff'; }
+  / 'steelblue'            { return '#4682b4ff'; }              / 'SteelBlue'            { return '#4682b4ff'; }
+  / 'tan'                  { return '#d2b48cff'; }              / 'Tan'                  { return '#d2b48cff'; }
+  / 'teal'                 { return '#008080ff'; }              / 'Teal'                 { return '#008080ff'; }
+  / 'thistle'              { return '#d8bfd8ff'; }              / 'Thistle'              { return '#d8bfd8ff'; }
+  / 'tomato'               { return '#ff6347ff'; }              / 'Tomato'               { return '#ff6347ff'; }
+  / 'turquoise'            { return '#40e0d0ff'; }              / 'Turquoise'            { return '#40e0d0ff'; }
+  / 'violet'               { return '#ee82eeff'; }              / 'Violet'               { return '#ee82eeff'; }
+  / 'wheat'                { return '#f5deb3ff'; }              / 'Wheat'                { return '#f5deb3ff'; }
+
+/* out of order because otherwise white would pre-run whitesmoke */
+  / 'whitesmoke'           { return '#f5f5f5ff'; }              / 'WhiteSmoke'           { return '#f5f5f5ff'; }
+  / 'white'                { return '#ffffffff'; }              / 'White'                { return '#ffffffff'; }
+
+/* out of order because otherwise yellow would pre-run yellowgreen */
+  / 'yellowgreen'          { return '#9acd32ff'; }              / 'YellowGreen'          { return '#9acd32ff'; }
+  / 'yellow'               { return '#ffff00ff'; }              / 'Yellow'               { return '#ffff00ff'; }
+
+SvgColor
+  = lab:SvgColorLabel WS? { return lab; }
+
+Rgb3
+  = '#' r:HexDigit g:HexDigit b:HexDigit WS? {
+    return `#${r}${r}${g}${g}${b}${b}ff`; }
+
+Rgb6
+  = '#' r1:HexDigit r2:HexDigit g1:HexDigit g2:HexDigit b1:HexDigit b2:HexDigit WS? {
+    return `#${r1}${r2}${g1}${g2}${b1}${b2}ff`; }
+
+Rgba4
+  = '#' r:HexDigit g:HexDigit b:HexDigit a:HexDigit WS? {
+    return `#${r}${r}${g}${g}${b}${b}${a}${a}`; }
+
+Rgba8
+  = '#' r1:HexDigit r2:HexDigit g1:HexDigit g2:HexDigit b1:HexDigit b2:HexDigit a1:HexDigit a2:HexDigit WS? {
+    return `#${r1}${r2}${g1}${g2}${b1}${b2}${a1}${a2}`; }
+
+Color "color"   // hoboy
+  = SvgColor
+  / Rgba8
+  / Rgb6
+  / Rgba4
+  / Rgb3
+
+
+
+ArrowItemKey
+  = "arc_label"
+  / "head_label"
+  / "tail_label"
+
+ArrowItem
+  = WS? key:ArrowItemKey WS? ":" WS? value:Label WS? ";" WS? { return {key:key, value:value}; }
+
+SingleEdgeColor "single edge color"
+  = WS? "edge_color" WS? ":" WS? value:Color WS? ";" WS? { return {key:'single_edge_color', value:value}; }
+
+TransitionLineStyle "transition line style"
+  = WS? "line-style" WS? ":" WS? value:LineStyle WS? ";" WS? { return {key:'transition_line_style', value:value}; }
+
+ArrowItems
+  = SingleEdgeColor
+  / TransitionLineStyle
+  / ArrowItem+
+
+ArrowDesc
+  = "{" WS? items:ArrowItems? WS? "}" { return items; }
+
+ArrowProbability
+  = value:NonNegNumber "%" { return { key: 'arrow probability', value: value }; }
+
+
+
+
+
+TimeType
+  = 'milliseconds' { return 1;                       }
+  / 'millisecond'  { return 1;                       }
+  / 'msecs'        { return 1;                       }
+  / 'msec'         { return 1;                       }
+  / 'ms'           { return 1;                       }
+
+  / 'seconds'      { return 1000;                    }
+  / 'second'       { return 1000;                    }
+  / 'secs'         { return 1000;                    }
+  / 'sec'          { return 1000;                    }
+  / 's'            { return 1000;                    }
+
+  / 'minutes'      { return 1000 * 60;               }
+  / 'minute'       { return 1000 * 60;               }
+  / 'mins'         { return 1000 * 60;               }
+  / 'min'          { return 1000 * 60;               }
+  / 'm'            { return 1000 * 60;               }
+
+  / 'hours'        { return 1000 * 60 * 60;          }
+  / 'hour'         { return 1000 * 60 * 60;          }
+  / 'hrs'          { return 1000 * 60 * 60;          }
+  / 'hr'           { return 1000 * 60 * 60;          }
+  / 'h'            { return 1000 * 60 * 60;          }
+
+  / 'days'         { return 1000 * 60 * 60 * 24;     }
+  / 'day'          { return 1000 * 60 * 60 * 24;     }
+  / 'd'            { return 1000 * 60 * 60 * 24;     }
+
+  / 'weeks'        { return 1000 * 60 * 60 * 24 * 7; }
+  / 'week'         { return 1000 * 60 * 60 * 24 * 7; }
+  / 'wks'          { return 1000 * 60 * 60 * 24 * 7; }
+  / 'wk'           { return 1000 * 60 * 60 * 24 * 7; }
+  / 'w'            { return 1000 * 60 * 60 * 24 * 7; }
+
+
+ArrowAfter
+  = 'after' WS value:NonNegNumber WS? timescale:TimeType? { return value * (timescale || 1000); }
+
+
+
+
+
+LabelList
+  = "[" WS? names:(Label WS?)* "]" { return names.map(i => i[0]); }
+
+LabelOrLabelList
+  = LabelList
+  / Label
+
+Stripe
+  = '+|' nzd:NonZeroDigit dd:DecimalDigit* { return { key: 'stripe', value:      parseInt(`${nzd}${dd}`, 10) }; }
+  / '-|' nzd:NonZeroDigit dd:DecimalDigit* { return { key: 'stripe', value: -1 * parseInt(`${nzd}${dd}`, 10) }; }
+
+Cycle
+  = '+' nzd:NonZeroDigit dd:DecimalDigit* { return { key: 'cycle', value:      parseInt(`${nzd}${dd}`, 10) }; }
+  / '-' nzd:NonZeroDigit dd:DecimalDigit* { return { key: 'cycle', value: -1 * parseInt(`${nzd}${dd}`, 10) }; }
+  / '+0'                                  { return { key: 'cycle', value: 0                                }; }
+
+ArrowTarget
+  = Stripe
+  / Cycle
+  / LabelList
+  / Label
+
+
+
+
+
+// todo these shouldn't be ordered, this is dumb // whargarbl comeback major
+
+Subexp
+  = WS? r_after  : ArrowAfter?
+    WS? r_action : ActionLabel?
+    WS? r_prob   : ArrowProbability?
+    WS? l_desc   : ArrowDesc?
+    WS? arrow    : Arrow
+    WS? r_desc   : ArrowDesc?
+    WS? l_prob   : ArrowProbability?
+    WS? l_action : ActionLabel?
+    WS? l_after  : ArrowAfter?
+    WS? label    : ArrowTarget
+    WS? tail     : Subexp? {
+
+      // Reminder: remove this type and the one in Exp if you want to work in pegjs online
+      // TODO: properly type this
+      const base: any = { kind: arrow, to: label };
+
+      if (l_after)               { base.l_after       = l_after;      }
+      if (tail && (tail !== [])) { base.se            = tail;         }
+      if (l_desc)                { base.l_desc        = l_desc;       }
+      if (r_desc)                { base.r_desc        = r_desc;       }
+      if (l_action)              { base.l_action      = l_action;     }
+      if (r_action)              { base.r_action      = r_action;     }
+      if (l_prob)                { base.l_probability = l_prob.value; }
+      if (r_prob)                { base.r_probability = r_prob.value; }
+      if (r_after)               { base.r_after       = r_after;      }
+
+      return base;
+
+    }
+
+
+
+
+
+Exp
+  = label:ArrowTarget se:Subexp WS? ';' WS? {
+    // Reminder: remove this type and the one in subexp if you want to work in pegjs online
+    // TODO: properly type this
+    const base: any = { key: 'transition', from: label };
+    if (se && (se !== [])) { base.se = se; }
+    return base;
+  }
+
+
+
+
+
+ValidationKey
+  = "whargarbl"
+  / "todo"
+
+ValidationItem
+  = validationkey:ValidationKey ":" value:Label ";" { return {key:validationkey, value:value}; }
+
+ValidationItems
+  = ValidationItem+
+
+ConfigValidation
+  = WS? "validation" WS? ":" WS? "{" WS? validation_items:ValidationItems? WS? "};" WS? {
+    return { config_kind: "validation", config_items: validation_items || [] };
+  }
+
+
+
+
+
+GvizLayout
+  = "dot"
+  / "circo"
+  / "fdp"
+  / "neato"
+
+// StateItemShapeKey
+//   = "shape"
+//
+// StateItemShape
+//   = WS? "shape" WS? ":" WS? value:GvizShape WS? ";" WS? { return { shape: value }; }
+//
+// StateItem
+//   = StateItemShape
+
+StateItems
+  = StateDeclarationItem+
+
+ConfigState
+  = WS? "state" WS? ":" WS? "{" WS? state_items:StateItems? WS? "};" WS? {
+    return { key: "default_state_config", value: state_items || [] };
+  }
+
+ConfigStartState
+  = WS? "start_state" WS? ":" WS? "{" WS? state_items:StateItems? WS? "};" WS? {
+    return { key: "default_start_state_config", value: state_items || [] };
+  }
+
+ConfigEndState
+  = WS? "end_state" WS? ":" WS? "{" WS? state_items:StateItems? WS? "};" WS? {
+    return { key: "default_end_state_config", value: state_items || [] };
+  }
+
+ConfigActiveState
+  = WS? "active_state" WS? ":" WS? "{" WS? state_items:StateItems? WS? "};" WS? {
+    return { key: "default_active_state_config", value: state_items || [] };
+  }
+
+ConfigTerminalState
+  = WS? "terminal_state" WS? ":" WS? "{" WS? state_items:StateItems? WS? "};" WS? {
+    return { key: "default_terminal_state_config", value: state_items || [] };
+  }
+
+ConfigHookedState
+  = WS? "hooked_state" WS? ":" WS? "{" WS? state_items:StateItems? WS? "};" WS? {
+    return { key: "default_hooked_state_config", value: state_items || [] };
+  }
+
+ConfigAnyState
+  = ConfigState
+  / ConfigStartState
+  / ConfigEndState
+  / ConfigActiveState
+  / ConfigTerminalState
+  / ConfigHookedState
+
+
+
+
+
+ActionKey
+  = "whargarbl"
+  / "todo"
+
+ActionItem
+  = actionkey:ActionKey ":" value:Label ";" { return {key:actionkey, value:value}; }
+
+ActionItems
+  = ActionItem+
+
+ConfigAction
+  = WS? "action" WS? ":" WS? "{" WS? action_items:ActionItems? WS? "};" WS? {
+    return { config_kind: "action", config_items: action_items || [] };
+  }
+
+
+
+
+
+TransitionKey
+  = "whargarbl"
+  / "todo"
+
+TransitionItem
+  = key:TransitionKey ":" value:Label ";" { return { key, value }; }
+
+TransitionItems
+  = GraphDefaultEdgeColor
+  / TransitionItem+
+
+GraphDefaultEdgeColor "graph default edge color"
+  = WS? "edge_color" WS? ":" WS? value:Color WS? ";" WS? { return { key:'graph_default_edge_color', value }; }
+
+ConfigTransition
+  = WS? "transition" WS? ":" WS? "{" WS? transition_items:TransitionItems? WS? "};" WS? {
+    return { config_kind: "transition", config_items: transition_items || [] };
+  }
+
+
+
+
+
+ConfigGraphLayout
+  = WS? "graph_layout"    WS? ":" WS? value:GvizLayout WS? ";" WS? { return { key: "graph_layout",    value: value }; }
+
+ConfigStartNodes
+  = WS? "start_states"    WS? ":" WS? value:LabelList  WS? ";" WS? { return { key: "start_states",    value: value }; }
+
+ConfigEndNodes
+  = WS? "end_states"      WS? ":" WS? value:LabelList  WS? ";" WS? { return { key: "end_states",      value: value }; }
+
+ConfigGraphBgColor
+  = WS? "graph_bg_color"  WS? ":" WS? value:Color      WS? ";" WS? { return { key: "graph_bg_color",  value: value }; }
+
+ConfigAllowsOverride
+  = WS? "allows_override" WS? ":" WS? value:OverrideT  WS? ";" WS? { return { key: "allows_override", value: value }; }
+
+
+
+
+
+OverrideT
+  = 'true'      { return true;      }
+  / 'false'     { return false;     }
+  / 'undefined' { return undefined; }
+
+
+
+
+
+Config "configuration"
+  = ConfigGraphLayout
+  / ConfigStartNodes
+  / ConfigEndNodes
+  / ConfigTransition
+  / ConfigAction
+  / ConfigAnyState
+  / ConfigValidation
+  / ConfigGraphBgColor
+  / ConfigAllowsOverride
+
+
+
+
+
+LicenseOrLabelOrList
+  = 'MIT'
+  / 'BSD 2-clause'
+  / 'BSD 3-clause'
+  / 'Apache 2.0'
+  / 'Mozilla 2.0'
+  / 'Public domain'
+  / 'GPL v2'
+  / 'GPL v3'
+  / 'LGPL v2.1'
+  / 'LGPL v3.0'
+  / 'Unknown'
+  / Label
+  / LabelList;
+
+
+
+
+
+Direction "direction"
+  = "up"
+  / "right"
+  / "down"
+  / "left";
+
+
+
+
+
+HookDefinition "hook definition (open/closed)"
+  = "open"
+  / "closed";
+
+
+
+
+
+MachineAuthor
+  = WS? "machine_author"      WS? ":" WS? value:LabelOrLabelList     WS? ";" WS? { return { key: "machine_author", value }; }
+
+MachineContributor
+  = WS? "machine_contributor" WS? ":" WS? value:LabelOrLabelList     WS? ";" WS? { return { key: "machine_contributor", value }; }
+
+MachineComment
+  = WS? "machine_comment"     WS? ":" WS? value:LabelOrLabelList     WS? ";" WS? { return { key: "machine_comment", value }; }
+
+MachineDefinition
+  = WS? "machine_definition"  WS? ":" WS? value:URL                  WS? ";" WS? { return { key: "machine_definition", value }; }
+
+MachineName
+  = WS? "machine_name"        WS? ":" WS? value:Label                WS? ";" WS? { return { key: "machine_name", value }; }
+
+MachineReference
+  = WS? "machine_reference"   WS? ":" WS? value:LabelOrLabelList     WS? ";" WS? { return { key: "machine_reference", value }; }
+
+MachineVersion
+  = WS? "machine_version"     WS? ":" WS? value:SemVer               WS? ";" WS? { return { key: "machine_version", value }; }
+
+MachineLicense
+  = WS? "machine_license"     WS? ":" WS? value:LicenseOrLabelOrList WS? ";" WS? { return { key: "machine_license", value }; }
+
+MachineLanguage
+  = WS? "machine_language"    WS? ":" WS? value:Label                WS? ";" WS? { return { key: "machine_language", value }; }
+
+FslVersion
+  = WS? "fsl_version"         WS? ":" WS? value:SemVer               WS? ";" WS? { return { key: "fsl_version", value }; }
+
+MachineTheme
+  = WS? "theme"               WS? ":" WS? value:ThemeOrThemeList     WS? ";" WS? { return { key: "theme", value }; }
+
+MachineFlow
+  = WS? "flow"                WS? ":" WS? value:Direction            WS? ";" WS? { return { key: "flow", value }; }
+
+MachineHookDefinition
+  = WS? "hooks"               WS? ":" WS? value:HookDefinition       WS? ";" WS? { return { key: "hook_definition", value }; }
+
+DotPreamble
+  = WS? "dot_preamble"        WS? ":" WS? value:String               WS? ";" WS? { return { key: "dot_preamble", value }; }
+
+
+MachineAttribute "machine attribute"
+  = FslVersion
+  / MachineName
+  / MachineAuthor
+  / MachineContributor
+  / MachineComment
+  / MachineDefinition
+  / MachineVersion
+  / MachineLicense
+  / MachineLanguage
+  / MachineTheme
+  / DotPreamble
+  / MachineFlow
+  / MachineHookDefinition
+
+
+
+
+
+PropertyVal
+  = String
+  / Boolean
+  / JsNumericLiteral
+  / Null
+  / Undefined
+
+
+
+
+
+SdStateLabel "color"
+  = WS? "label"            WS? ":" WS? value:Label     WS? ";" WS? { return { key:'state-label', value }; }
+
+SdStateColor "color"
+  = WS? "color"            WS? ":" WS? value:Color     WS? ";" WS? { return { key:'color', value }; }
+
+SdStateTextColor "text color"
+  = WS? "text-color"       WS? ":" WS? value:Color     WS? ";" WS? { return { key:'text-color', value }; }
+
+SdStateBackgroundColor "background color"
+  = WS? "background-color" WS? ":" WS? value:Color     WS? ";" WS? { return { key:'background-color', value }; }
+
+SdStateBorderColor "border color"
+  = WS? "border-color"     WS? ":" WS? value:Color     WS? ";" WS? { return { key:'border-color', value }; }
+
+SdStateShape "shape"
+  = WS? "shape"            WS? ":" WS? value:GvizShape WS? ";" WS? { return { key:'shape', value }; }
+
+SdStateCorners "corners"
+  = WS? "corners"          WS? ":" WS? value:Corners   WS? ";" WS? { return { key:'corners', value }; }
+
+SdStateLineStyle "linestyle"
+  = WS? "line-style"       WS? ":" WS? value:LineStyle WS? ";" WS? { return { key:'line-style', value }; }
+  / WS? "linestyle"        WS? ":" WS? value:LineStyle WS? ";" WS? { return { key:'line-style', value }; }
+
+
+SdStateProperty "state property"
+  = WS? "property" WS? ":" WS? name:Atom WS value:PropertyVal               WS? ";" WS? {
+    return { key: 'state_property', name, value }
+  }
+  / WS? "property" WS? ":" WS? name:Atom WS value:PropertyVal WS 'required' WS? ";" WS? {
+    return { key: 'state_property', name, value, required: true }
+  }
+
+
+StateDeclarationItem
+  = SdStateLabel
+  / SdStateColor
+  / SdStateTextColor
+  / SdStateBackgroundColor
+  / SdStateBorderColor
+  / SdStateShape
+  / SdStateCorners
+  / SdStateLineStyle
+  / SdStateProperty
+
+StateDeclarationDesc
+  = "{" WS? items:StateDeclarationItem* WS? "}" { return items; }
+
+StateDeclaration
+  = WS? "state" WS name:Label WS? ":" WS? value:StateDeclarationDesc WS? ";" WS? { return { key:'state_declaration', name, value }; }
+
+
+
+
+
+NamedList
+  = WS? "&" WS? name:Label WS? ":" WS? value:LabelOrLabelList WS? ";" WS? { return { key:'named_list', name, value }; }
+
+
+
+
+
+MachinePropertyDefault
+  = PropertyVal
+//   / MachinePropertyDefaultArray
+//   / MachinePropertyDefaultObject
+
+MachineProperty
+  = WS? "property" WS name:Label WS 'default' WS default_value:MachinePropertyDefault WS  'required' WS? ";" WS? { return { key:'property_definition', name, default_value, required: true }; }
+  / WS? "property" WS name:Label                                                      WS  'required' WS? ";" WS? { return { key:'property_definition', name,                required: true }; }
+  / WS? "property" WS name:Label WS 'default' WS default_value:MachinePropertyDefault                WS? ";" WS? { return { key:'property_definition', name, default_value                 }; }
+  / WS? "property" WS name:Label                                                                     WS? ";" WS? { return { key:'property_definition', name                                }; }
+
+
+
+
+
+RegularArrangeDeclaration
+  = "arrange"       WS? value:LabelOrLabelList WS? ";" WS? { return { key: 'arrange_declaration', value }; }
+
+ArrangeStartDeclaration
+  = "arrange-start" WS? value:LabelOrLabelList WS? ";" WS? { return { key: 'arrange_start_declaration', value }; }
+
+ArrangeEndDeclaration
+  = "arrange-end"   WS? value:LabelOrLabelList WS? ";" WS? { return { key: 'arrange_end_declaration', value }; }
+
+ArrangeDeclaration "arrange declaration"
+  = ArrangeStartDeclaration
+  / ArrangeEndDeclaration
+  / RegularArrangeDeclaration
+
+
+
+
+
+Term
+  = Exp
+  / StateDeclaration
+  / ArrangeDeclaration
+  / NamedList
+  / MachineAttribute
+  / MachineProperty
+  / Config
+
+TermList
+  = term:Term*
